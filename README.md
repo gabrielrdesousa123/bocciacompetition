@@ -9,7 +9,8 @@ scoreboard and World Boccia (BCMS) integration.
 > (draw engine, BCMS integration and official ranking are not included here).
 > The full system is proprietary and licensed under contract.
 
-**Live demo:** open `index.html` in your browser (double-click) or visit the published page.
+**Live demo:** https://gabrielrdesousa123.github.io/bocciacompetition/
+(or open `index.html` in your browser by double-clicking it).
 
 **Languages:** the demo and this document are available in **English**, **Spanish** and
 **Portuguese** (language switch in the top-right of the demo).
