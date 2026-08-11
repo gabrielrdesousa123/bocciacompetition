@@ -1,0 +1,19 @@
+PROPRIETARY LICENSE — SCBP (Boccia Competition System)
+LICENÇA PROPRIETÁRIA / LICENCIA PROPIETARIA
+
+Copyright (c) 2026 Gabriel Sousa. All rights reserved. / Todos os direitos reservados.
+
+This repository contains ONLY demonstration material (a mock front-end, documentation and
+descriptions) of the SCBP software. The system source code is PROPRIETARY and is NOT
+licensed, distributed or made publicly available.
+
+Without prior written authorization from the owner, it is PROHIBITED to:
+  - copy, reproduce or redistribute the software or any part of it;
+  - reverse engineer, decompile or disassemble;
+  - use the software or its documentation for commercial purposes.
+
+Use of the SCBP software is granted exclusively under a license agreement with the owner.
+For licensing, contact: gabrielrdesousa@gmail.com
+
+Third-party names (World Boccia, BISFed, BCMS, etc.) belong to their respective owners and
+are mentioned for descriptive purposes only.

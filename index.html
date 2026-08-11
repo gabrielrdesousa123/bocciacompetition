@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SCBP — PUBLIC DEMO / DEMOSTRACIÓN / DEMONSTRAÇÃO (standalone)
+  ----------------------------------------------------------------------------
+  Runs 100% in the browser with FICTIONAL data. No backend, no login, no keys,
+  no commercial logic (draw, World Boccia/BCMS integration, official ranking).
+  Full proprietary system: see README. Contact: gabrielrdesousa@gmail.com
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCBP — Boccia Competition System · Demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; }
+  header { background: #0b1220; border-bottom: 1px solid #1e293b; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  header h1 { font-size: 18px; color: #fff; }
+  header .badge { font-size: 11px; background: #1e293b; color: #94a3b8; padding: 4px 10px; border-radius: 999px; }
+  .lang { display:flex; gap:4px; }
+  .lang button { background:#1e293b; color:#cbd5e1; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
+  .lang button.active { background:#2563eb; color:#fff; }
+  nav { display: flex; gap: 6px; background: #0b1220; padding: 10px 24px; border-bottom: 1px solid #1e293b; flex-wrap: wrap; }
+  nav button { background: #1e293b; color: #cbd5e1; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  nav button.active { background: #2563eb; color: #fff; }
+  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px; }
+  .aviso { background: #7c2d12; color: #fed7aa; font-size: 12px; padding: 8px 24px; text-align: center; }
+  .card { background: #fff; color: #0f172a; border-radius: 12px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+  .sum-head { text-align: center; padding: 18px; }
+  .sum-title { font-size: 20px; font-weight: 900; text-transform: uppercase; }
+  table.sum { width: 100%; border-collapse: collapse; }
+  table.sum th, table.sum td { border: 1px solid #000; padding: 10px; text-align: center; }
+  .p-red { background: #dc2626; color: #fff; font-weight: 900; }
+  .p-blue { background: #2563eb; color: #fff; font-weight: 900; }
+  .p-name { font-size: 16px; } .p-club { font-size: 12px; opacity: .95; }
+  .sc-red { color: #dc2626; font-weight: 900; font-size: 22px; }
+  .sc-blue { color: #2563eb; font-weight: 900; font-size: 22px; }
+  .final td { background: #e2e8f0; font-weight: 900; font-size: 26px; }
+  .winner { text-align:center; margin-top:14px; padding:12px; border:3px solid #000; border-radius:8px; background:#f1f5f9; font-weight:900; text-transform:uppercase; color:#000; }
+  .bk { display:flex; gap:40px; overflow-x:auto; padding:20px; }
+  .bk-col { display:flex; flex-direction:column; justify-content:space-around; gap:20px; min-width:220px; }
+  .bk-col h4 { color:#64748b; font-size:11px; letter-spacing:1px; text-transform:uppercase; text-align:center; margin-bottom:8px; }
+  .bk-match { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; }
+  .bk-row { display:flex; justify-content:space-between; padding:8px 12px; font-size:13px; border-bottom:1px solid #eef2f7; }
+  .bk-row.win { background:#f0fdf4; font-weight:800; }
+  .sb { background:#0b1220; color:#fff; border-radius:12px; padding:24px; }
+  .sb-match { display:flex; align-items:center; justify-content:space-between; padding:14px 10px; border-bottom:1px solid #1e293b; }
+  .sb-side { display:flex; align-items:center; gap:10px; font-size:15px; }
+  .dot-r { width:12px; height:12px; border-radius:50%; background:#ef4444; }
+  .dot-b { width:12px; height:12px; border-radius:50%; background:#3b82f6; }
+  .sb-score { font-size:22px; font-weight:900; }
+  footer { text-align:center; color:#64748b; font-size:12px; padding:24px; border-top:1px solid #1e293b; }
+  footer a { color:#60a5fa; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>SCBP — Boccia Competition System</h1>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div class="lang">
+        <button data-lang="en" class="active">EN</button>
+        <button data-lang="es">ES</button>
+        <button data-lang="pt">PT</button>
+      </div>
+      <span class="badge" id="badge">DEMO · fictional data</span>
+    </div>
+  </header>
+  <div class="aviso" id="aviso"></div>
+  <nav id="nav"></nav>
+  <main id="app"></main>
+  <footer id="footer"></footer>
+
+<script>
+// ─── i18n (EN / ES / PT) ─────────────────────────────────────────────────────
+const I18N = {
+  en: { badge:'DEMO · fictional data',
+        aviso:'Appearance demo only. Not the live system — no database, no login. Full system under license (contact below).',
+        tabs:{sumula:'Live scoresheet', chave:'Bracket', scoreboard:'Scoreboard'},
+        title:'GAME SCORESHEET', timeV:'Time (R)', pts:'Points', partial:'End', timeA:'Time (B)',
+        finalScore:'FINAL SCORE', winner:'Winner', vs:'RED × BLUE',
+        qf:'Quarterfinals', sf:'Semifinal', fin:'Final', live:'Live scoreboard — matches in progress',
+        court:'Court', footer:'SCBP — proprietary software for para boccia competition management.',
+        contact:'Interested? Contact:' },
+  es: { badge:'DEMO · datos ficticios',
+        aviso:'Demostración de apariencia. No es el sistema real — sin base de datos, sin inicio de sesión. Sistema completo bajo licencia (contacto abajo).',
+        tabs:{sumula:'Planilla en vivo', chave:'Cuadro', scoreboard:'Marcador'},
+        title:'PLANILLA DE JUEGO', timeV:'Tiempo (R)', pts:'Puntos', partial:'Parcial', timeA:'Tiempo (A)',
+        finalScore:'MARCADOR FINAL', winner:'Ganador', vs:'ROJO × AZUL',
+        qf:'Cuartos de final', sf:'Semifinal', fin:'Final', live:'Marcador en vivo — partidos en curso',
+        court:'Cancha', footer:'SCBP — software propietario para gestión de competiciones de boccia paralímpica.',
+        contact:'¿Interesado? Contacto:' },
+  pt: { badge:'DEMO · dados fictícios',
+        aviso:'Demonstração de aparência. Não é o sistema real — sem banco, sem login. Sistema completo sob licença (contato abaixo).',
+        tabs:{sumula:'Súmula ao vivo', chave:'Chaveamento', scoreboard:'Scoreboard'},
+        title:'SÚMULA DE JOGO', timeV:'Tempo (V)', pts:'Pontos', partial:'Parcial', timeA:'Tempo (A)',
+        finalScore:'PLACAR FINAL', winner:'Vencedor', vs:'VERMELHO × AZUL',
+        qf:'Quartas de Final', sf:'Semifinal', fin:'Final', live:'Placar ao vivo — jogos em andamento',
+        court:'Quadra', footer:'SCBP — software proprietário para gestão de competições de bocha paralímpica.',
+        contact:'Interessado? Contato:' },
+};
+const EMAIL = 'gabrielrdesousa@gmail.com';
+
+// ─── FICTIONAL DATA (mock) ───────────────────────────────────────────────────
+const partida = {
+  comp:'DEMO BOCCIA CUP',
+  p1: { bib:'1105', nome:'RED ATHLETE (DEMO)', clube:'ALPHA CLUB' },
+  p2: { bib:'1102', nome:'BLUE ATHLETE (DEMO)', clube:'BETA CLUB' },
+  parciais:[ {p1:1,p2:0,t1:'00:14',t2:'01:48'}, {p1:1,p2:0,t1:'00:06',t2:'00:00'},
+             {p1:3,p2:0,t1:'00:56',t2:'02:39'}, {p1:1,p2:0,t1:'00:00',t2:'01:37'} ],
+};
+const chave = {
+  QF:[ ['1105 · ALPHA','1104 · DELTA','10','1'], ['1102 · BETA','1108 · GAMMA','6','2'] ],
+  SF:[ ['WINNER QF1','WINNER QF2','—','—'] ],
+  FIN:[ ['WINNER SF1','WINNER SF2','—','—'] ],
+};
+const scoreboard = [
+  { r:'2401 · ALPHA', b:'2404 · DELTA', sr:4, sb:2, court:1 },
+  { r:'2402 · BETA', b:'2408 · GAMMA', sr:1, sb:6, court:2 },
+  { r:'2405 · OMEGA', b:'2406 · SIGMA', sr:3, sb:3, court:3 },
+];
+
+let LANG = 'en', TELA = 'sumula';
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const T = () => I18N[LANG];
+
+function pintarNav() {
+  const t = T().tabs;
+  document.getElementById('nav').innerHTML = Object.keys(t).map(k =>
+    `<button data-tela="${k}" class="${k===TELA?'active':''}">${esc(t[k])}</button>`).join('');
+  document.querySelectorAll('#nav button').forEach(b => b.onclick = () => { TELA=b.dataset.tela; render(); });
+  document.getElementById('badge').textContent = T().badge;
+  document.getElementById('aviso').textContent = T().aviso;
+  document.getElementById('footer').innerHTML = `${esc(T().footer)}<br>${esc(T().contact)} <a href="mailto:${EMAIL}">${EMAIL}</a> · Gabriel Sousa.`;
+}
+
+function telaSumula() {
+  const P = partida, L = T();
+  const t1 = P.parciais.reduce((s,p)=>s+p.p1,0), t2 = P.parciais.reduce((s,p)=>s+p.p2,0);
+  const rows = P.parciais.map((p,i)=>`<tr><td>${p.t1}</td><td class="sc-red">${p.p1}</td>
+    <td style="background:#f8fafc;font-weight:800;">P${i+1}</td><td class="sc-blue">${p.p2}</td><td>${p.t2}</td></tr>`).join('');
+  const w = t1>t2?P.p1:P.p2;
+  app.innerHTML = `<div class="card">
+    <div class="sum-head"><div class="sum-title">${esc(L.title)} — ${esc(P.comp)}</div></div>
+    <table class="sum"><thead>
+      <tr><th colspan="2" class="p-red"><div class="p-name">${esc(P.p1.bib+' - '+P.p1.nome)}</div><div class="p-club">${esc(P.p1.clube)}</div></th>
+      <th style="background:#0f172a;color:#fff;">${esc(L.vs)}</th>
+      <th colspan="2" class="p-blue"><div class="p-name">${esc(P.p2.bib+' - '+P.p2.nome)}</div><div class="p-club">${esc(P.p2.clube)}</div></th></tr>
+      <tr style="background:#f1f5f9;"><th>${esc(L.timeV)}</th><th>${esc(L.pts)}</th><th>${esc(L.partial)}</th><th>${esc(L.pts)}</th><th>${esc(L.timeA)}</th></tr>
+      </thead><tbody>${rows}</tbody>
+      <tfoot><tr class="final"><td colspan="2" class="sc-red">${t1}</td><td>${esc(L.finalScore)}</td><td colspan="2" class="sc-blue">${t2}</td></tr></tfoot></table>
+    <div style="padding:0 18px 18px;"><div class="winner">${esc(L.winner)}: ${esc(w.bib+' - '+w.nome)} (${esc(w.clube)})</div></div>
+  </div>`;
+}
+function telaChave() {
+  const L = T();
+  const col = (titulo,jogos)=>`<div class="bk-col"><h4>${esc(titulo)}</h4>${jogos.map(j=>`
+    <div class="bk-match"><div class="bk-row ${(+j[2]>+j[3])?'win':''}"><span>${esc(j[0])}</span><b>${esc(j[2])}</b></div>
+    <div class="bk-row ${(+j[3]>+j[2])?'win':''}"><span>${esc(j[1])}</span><b>${esc(j[3])}</b></div></div>`).join('')}</div>`;
+  app.innerHTML = `<div class="card"><div class="bk">${col(L.qf,chave.QF)}${col(L.sf,chave.SF)}${col(L.fin,chave.FIN)}</div></div>`;
+}
+function telaScoreboard() {
+  const L = T();
+  app.innerHTML = `<div class="sb"><h2 style="margin-bottom:14px;">${esc(L.live)}</h2>
+    ${scoreboard.map(m=>`<div class="sb-match">
+      <div class="sb-side"><span class="dot-r"></span>${esc(m.r)}</div>
+      <div class="sb-score">${m.sr} <span style="color:#475569;">×</span> ${m.sb}</div>
+      <div class="sb-side">${esc(m.b)}<span class="dot-b"></span></div>
+      <div style="color:#94a3b8;font-size:12px;min-width:90px;text-align:right;">${esc(L.court)} ${m.court}</div></div>`).join('')}
+  </div>`;
+}
+function render() {
+  pintarNav();
+  ({ sumula:telaSumula, chave:telaChave, scoreboard:telaScoreboard })[TELA]();
+}
+document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
+  LANG=b.dataset.lang; document.documentElement.lang=LANG;
+  document.querySelectorAll('.lang button').forEach(x=>x.classList.toggle('active', x===b));
+  render();
+});
+render();
+</script>
+</body>
+</html>
