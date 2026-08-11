@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ============================================================================
-  SCBP — PUBLIC DEMO / DEMOSTRACIÓN / DEMONSTRAÇÃO (standalone)
+  SCBP - PUBLIC DEMO / DEMOSTRACION / DEMONSTRACAO (standalone)
   ----------------------------------------------------------------------------
   Runs 100% in the browser with FICTIONAL data. No backend, no login, no keys,
   no commercial logic (draw, World Boccia/BCMS integration, official ranking).
@@ -12,138 +12,373 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SCBP — Boccia Competition System · Demo</title>
+<title>SCBP - Boccia Competition System - Demo</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; }
-  header { background: #0b1220; border-bottom: 1px solid #1e293b; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-  header h1 { font-size: 18px; color: #fff; }
+  a { color: inherit; }
+  header { background: #0b1220; border-bottom: 1px solid #1e293b; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  header .brand { display:flex; align-items:center; gap:10px; }
+  header h1 { font-size: 17px; color: #fff; }
+  header .role { font-size:11px; color:#93c5fd; background:#1e3a8a; padding:3px 9px; border-radius:999px; font-weight:700; }
   header .badge { font-size: 11px; background: #1e293b; color: #94a3b8; padding: 4px 10px; border-radius: 999px; }
   .lang { display:flex; gap:4px; }
   .lang button { background:#1e293b; color:#cbd5e1; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
   .lang button.active { background:#2563eb; color:#fff; }
-  nav { display: flex; gap: 6px; background: #0b1220; padding: 10px 24px; border-bottom: 1px solid #1e293b; flex-wrap: wrap; }
-  nav button { background: #1e293b; color: #cbd5e1; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
-  nav button.active { background: #2563eb; color: #fff; }
-  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px; }
-  .aviso { background: #7c2d12; color: #fed7aa; font-size: 12px; padding: 8px 24px; text-align: center; }
-  .card { background: #fff; color: #0f172a; border-radius: 12px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
-  .sum-head { text-align: center; padding: 18px; }
-  .sum-title { font-size: 20px; font-weight: 900; text-transform: uppercase; }
-  table.sum { width: 100%; border-collapse: collapse; }
-  table.sum th, table.sum td { border: 1px solid #000; padding: 10px; text-align: center; }
-  .p-red { background: #dc2626; color: #fff; font-weight: 900; }
-  .p-blue { background: #2563eb; color: #fff; font-weight: 900; }
-  .p-name { font-size: 16px; } .p-club { font-size: 12px; opacity: .95; }
-  .sc-red { color: #dc2626; font-weight: 900; font-size: 22px; }
-  .sc-blue { color: #2563eb; font-weight: 900; font-size: 22px; }
-  .final td { background: #e2e8f0; font-weight: 900; font-size: 26px; }
+  .aviso { background: #7c2d12; color: #fed7aa; font-size: 12px; padding: 8px 22px; text-align: center; }
+
+  .shell { display:flex; min-height: calc(100vh - 120px); }
+  aside { width: 210px; background:#0b1220; border-right:1px solid #1e293b; padding:14px 10px; flex-shrink:0; }
+  aside .side-title { font-size:10px; letter-spacing:1px; text-transform:uppercase; color:#475569; padding:6px 10px; }
+  aside button { display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:transparent; color:#cbd5e1; border:none; padding:9px 10px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; }
+  aside button:hover { background:#111a2e; }
+  aside button.active { background:#2563eb; color:#fff; }
+  main { flex:1; max-width:1000px; margin:0 auto; padding: 22px 18px; width:100%; }
+
+  .crumb { font-size:12px; color:#64748b; margin-bottom:14px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .crumb b { color:#cbd5e1; }
+  .crumb .lnk { color:#60a5fa; cursor:pointer; }
+  h2.page { font-size:20px; color:#fff; margin-bottom:4px; }
+  p.sub { color:#94a3b8; font-size:13px; margin-bottom:18px; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+  .tile { background:#111a2e; border:1px solid #1e293b; border-radius:12px; padding:16px; cursor:pointer; transition:.15s; }
+  .tile:hover { border-color:#2563eb; transform:translateY(-2px); }
+  .tile .k { font-size:26px; font-weight:900; color:#fff; }
+  .tile .l { font-size:13px; color:#94a3b8; margin-top:4px; }
+  .tile .go { font-size:11px; color:#60a5fa; margin-top:10px; font-weight:700; }
+
+  .panel { background:#111a2e; border:1px solid #1e293b; border-radius:12px; padding:16px; margin-bottom:16px; }
+  .panel h3 { font-size:14px; color:#fff; margin-bottom:12px; text-transform:uppercase; letter-spacing:.5px; }
+  .kv { display:flex; flex-wrap:wrap; gap:10px 26px; }
+  .kv div { font-size:13px; } .kv .lbl { color:#64748b; font-size:11px; text-transform:uppercase; }
+  .kv .val { color:#e2e8f0; font-weight:700; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .chip { background:#1e293b; color:#cbd5e1; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; }
+  .chip.active { background:#2563eb; color:#fff; }
+  .btn { background:#2563eb; color:#fff; border:none; padding:9px 16px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .btn.ghost { background:#1e293b; color:#cbd5e1; }
+  .btnrow { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+
+  table.data { width:100%; border-collapse:collapse; font-size:13px; }
+  table.data th { text-align:left; color:#64748b; font-size:11px; text-transform:uppercase; border-bottom:1px solid #1e293b; padding:8px 10px; }
+  table.data td { border-bottom:1px solid #16213a; padding:9px 10px; color:#e2e8f0; }
+  table.data tr:hover td { background:#0d1526; }
+  .rowlink { cursor:pointer; }
+  .tag { font-size:11px; padding:2px 8px; border-radius:999px; font-weight:700; }
+  .tag.grp { background:#1e3a8a; color:#bfdbfe; } .tag.ko { background:#78350f; color:#fed7aa; }
+  .win { color:#4ade80; font-weight:800; } .los { color:#94a3b8; }
+
+  /* Light cards (sumula/scoreboard/bracket) */
+  .card { background:#fff; color:#0f172a; border-radius:12px; overflow:hidden; margin-bottom:18px; box-shadow:0 10px 30px rgba(0,0,0,.3); }
+  .sum-head { text-align:center; padding:16px; }
+  .sum-title { font-size:18px; font-weight:900; text-transform:uppercase; }
+  table.sum { width:100%; border-collapse:collapse; }
+  table.sum th, table.sum td { border:1px solid #000; padding:9px; text-align:center; }
+  .p-red { background:#dc2626; color:#fff; font-weight:900; }
+  .p-blue { background:#2563eb; color:#fff; font-weight:900; }
+  .p-name { font-size:15px; } .p-club { font-size:12px; opacity:.95; }
+  .sc-red { color:#dc2626; font-weight:900; font-size:20px; }
+  .sc-blue { color:#2563eb; font-weight:900; font-size:20px; }
+  .final td { background:#e2e8f0; font-weight:900; font-size:24px; }
   .winner { text-align:center; margin-top:14px; padding:12px; border:3px solid #000; border-radius:8px; background:#f1f5f9; font-weight:900; text-transform:uppercase; color:#000; }
-  .bk { display:flex; gap:40px; overflow-x:auto; padding:20px; }
-  .bk-col { display:flex; flex-direction:column; justify-content:space-around; gap:20px; min-width:220px; }
-  .bk-col h4 { color:#64748b; font-size:11px; letter-spacing:1px; text-transform:uppercase; text-align:center; margin-bottom:8px; }
+  .bk { display:flex; gap:36px; overflow-x:auto; padding:18px; }
+  .bk-col { display:flex; flex-direction:column; justify-content:space-around; gap:18px; min-width:200px; }
+  .bk-col h4 { color:#64748b; font-size:11px; letter-spacing:1px; text-transform:uppercase; text-align:center; margin-bottom:6px; }
   .bk-match { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; }
   .bk-row { display:flex; justify-content:space-between; padding:8px 12px; font-size:13px; border-bottom:1px solid #eef2f7; }
-  .bk-row.win { background:#f0fdf4; font-weight:800; }
-  .sb { background:#0b1220; color:#fff; border-radius:12px; padding:24px; }
-  .sb-match { display:flex; align-items:center; justify-content:space-between; padding:14px 10px; border-bottom:1px solid #1e293b; }
+  .bk-row.w { background:#f0fdf4; font-weight:800; }
+  .sb { background:#0b1220; color:#fff; border-radius:12px; padding:22px; }
+  .sb-match { display:flex; align-items:center; justify-content:space-between; padding:13px 8px; border-bottom:1px solid #1e293b; }
   .sb-side { display:flex; align-items:center; gap:10px; font-size:15px; }
   .dot-r { width:12px; height:12px; border-radius:50%; background:#ef4444; }
   .dot-b { width:12px; height:12px; border-radius:50%; background:#3b82f6; }
   .sb-score { font-size:22px; font-weight:900; }
-  footer { text-align:center; color:#64748b; font-size:12px; padding:24px; border-top:1px solid #1e293b; }
+  .report { background:#fff; color:#0f172a; border-radius:12px; padding:26px; box-shadow:0 10px 30px rgba(0,0,0,.3); }
+  .report h3 { text-align:center; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .report .rsub { text-align:center; color:#475569; font-size:12px; margin-bottom:18px; }
+  table.rank { width:100%; border-collapse:collapse; }
+  table.rank th { background:#0f172a; color:#fff; padding:9px; font-size:12px; text-transform:uppercase; }
+  table.rank td { border-bottom:1px solid #e2e8f0; padding:9px; text-align:center; font-size:13px; }
+  table.rank td.name { text-align:left; font-weight:700; }
+  .medal1 { background:#fef9c3; } .medal2 { background:#f1f5f9; } .medal3 { background:#ffedd5; }
+
+  footer { text-align:center; color:#64748b; font-size:12px; padding:20px; border-top:1px solid #1e293b; }
   footer a { color:#60a5fa; }
+  @media (max-width:720px){ aside{ width:100%; display:flex; overflow-x:auto; gap:4px; } aside .side-title{display:none;} .shell{flex-direction:column;} aside button{width:auto;white-space:nowrap;} }
 </style>
 </head>
 <body>
   <header>
-    <h1>SCBP — Boccia Competition System</h1>
+    <div class="brand">
+      <h1>SCBP - Boccia Competition System</h1>
+      <span class="role" id="role"></span>
+    </div>
     <div style="display:flex;gap:10px;align-items:center;">
       <div class="lang">
         <button data-lang="en" class="active">EN</button>
         <button data-lang="es">ES</button>
         <button data-lang="pt">PT</button>
       </div>
-      <span class="badge" id="badge">DEMO · fictional data</span>
+      <span class="badge" id="badge"></span>
     </div>
   </header>
   <div class="aviso" id="aviso"></div>
-  <nav id="nav"></nav>
-  <main id="app"></main>
+
+  <div class="shell">
+    <aside id="side"></aside>
+    <main id="app"></main>
+  </div>
   <footer id="footer"></footer>
 
 <script>
-// ─── i18n (EN / ES / PT) ─────────────────────────────────────────────────────
-const I18N = {
-  en: { badge:'DEMO · fictional data',
-        aviso:'Appearance demo only. Not the live system — no database, no login. Full system under license (contact below).',
-        tabs:{sumula:'Live scoresheet', chave:'Bracket', scoreboard:'Scoreboard'},
-        title:'GAME SCORESHEET', timeV:'Time (R)', pts:'Points', partial:'End', timeA:'Time (B)',
-        finalScore:'FINAL SCORE', winner:'Winner', vs:'RED × BLUE',
-        qf:'Quarterfinals', sf:'Semifinal', fin:'Final', live:'Live scoreboard — matches in progress',
-        court:'Court', footer:'SCBP — proprietary software for para boccia competition management.',
-        contact:'Interested? Contact:' },
-  es: { badge:'DEMO · datos ficticios',
-        aviso:'Demostración de apariencia. No es el sistema real — sin base de datos, sin inicio de sesión. Sistema completo bajo licencia (contacto abajo).',
-        tabs:{sumula:'Planilla en vivo', chave:'Cuadro', scoreboard:'Marcador'},
-        title:'PLANILLA DE JUEGO', timeV:'Tiempo (R)', pts:'Puntos', partial:'Parcial', timeA:'Tiempo (A)',
-        finalScore:'MARCADOR FINAL', winner:'Ganador', vs:'ROJO × AZUL',
-        qf:'Cuartos de final', sf:'Semifinal', fin:'Final', live:'Marcador en vivo — partidos en curso',
-        court:'Cancha', footer:'SCBP — software propietario para gestión de competiciones de boccia paralímpica.',
-        contact:'¿Interesado? Contacto:' },
-  pt: { badge:'DEMO · dados fictícios',
-        aviso:'Demonstração de aparência. Não é o sistema real — sem banco, sem login. Sistema completo sob licença (contato abaixo).',
-        tabs:{sumula:'Súmula ao vivo', chave:'Chaveamento', scoreboard:'Scoreboard'},
-        title:'SÚMULA DE JOGO', timeV:'Tempo (V)', pts:'Pontos', partial:'Parcial', timeA:'Tempo (A)',
-        finalScore:'PLACAR FINAL', winner:'Vencedor', vs:'VERMELHO × AZUL',
-        qf:'Quartas de Final', sf:'Semifinal', fin:'Final', live:'Placar ao vivo — jogos em andamento',
-        court:'Quadra', footer:'SCBP — software proprietário para gestão de competições de bocha paralímpica.',
-        contact:'Interessado? Contato:' },
-};
 const EMAIL = 'gabrielrdesousa@gmail.com';
 
-// ─── FICTIONAL DATA (mock) ───────────────────────────────────────────────────
+// i18n
+const I18N = {
+  en:{ role:'National Admin', badge:'DEMO - fictional data',
+    aviso:'Navigation demo with fictional data. Not the live system - no database, no login. Full system under license (contact below).',
+    menu:{home:'Dashboard', comps:'Competitions', athletes:'Athletes', clubs:'Clubs', classes:'Classes', officials:'Officials', reports:'Reports'},
+    dash:'Dashboard', dashSub:'National overview - click a card to explore.',
+    kpiComps:'Competitions', kpiAthletes:'Athletes', kpiClubs:'Clubs', kpiClasses:'Classes', kpiOfficials:'Officials', kpiFeds:'Federations',
+    open:'Open', ongoing:'ongoing',
+    compList:'Competitions', compListSub:'Fictional list. Click a row to open.',
+    thComp:'Competition', thDate:'Date', thClasses:'Classes', thStatus:'Status', statusLive:'IN PROGRESS', statusDone:'FINISHED',
+    compOverview:'Overview', general:'General data', location:'Location', dates:'Dates', level:'Level', natl:'National',
+    classesTitle:'Classes / categories', pickClass:'Select a class to see games',
+    schedule:'Schedule (summary)', thTime:'Time', thCourt:'Court', thMatch:'Match',
+    goGames:'View games table',
+    gamesTitle:'Games table', method:'Method of play', methodTxt:'Round-robin groups + knockout (BISFed manual). Top sides per group advance; playoff when needed for 3/5/6/7 groups.',
+    groups:'Groups (round-robin)', standings:'Standings', knockout:'Knockout bracket',
+    thPos:'#', thTeam:'Athlete / Team', thP:'P', thW:'W', thL:'L', thPts:'Pts', thDiff:'Diff',
+    viewSheet:'Live scoresheet', viewBoard:'Scoreboard',
+    court:'Court', vs:'RED x BLUE', title:'GAME SCORESHEET', timeV:'Time (R)', pts:'Points', partial:'End', timeA:'Time (B)', finalScore:'FINAL SCORE', winner:'Winner',
+    qf:'Quarterfinals', sf:'Semifinal', fin:'Final', live:'Live scoreboard - matches in progress',
+    reportsTitle:'Reports', reportsSub:'Documents generated by the system (mock).',
+    rFinal:'Final ranking', rSheet:'Scoresheet PDF', rDT:'Technical Delegate report',
+    finalRank:'FINAL RANKING', dtReport:'TECHNICAL DELEGATE REPORT', generated:'Generated by SCBP - demo',
+    dtLine1:'Competition held as scheduled. All classes completed.',
+    dtLine2:'Games: 24 played, 0 walkovers, 1 double forfeit recorded.',
+    dtLine3:'Standings resolved with the 8 official tie-break criteria.',
+    dtLine4:'Results synced with World Boccia (BCMS) - no divergences.',
+    footer:'SCBP - proprietary software for para boccia competition management.', contact:'Interested? Contact:' },
+  es:{ role:'Admin Nacional', badge:'DEMO - datos ficticios',
+    aviso:'Demo de navegacion con datos ficticios. No es el sistema real - sin base de datos, sin inicio de sesion. Sistema completo bajo licencia (contacto abajo).',
+    menu:{home:'Panel', comps:'Competiciones', athletes:'Atletas', clubs:'Clubes', classes:'Clases', officials:'Oficiales', reports:'Informes'},
+    dash:'Panel', dashSub:'Vision nacional - haz clic en una tarjeta para explorar.',
+    kpiComps:'Competiciones', kpiAthletes:'Atletas', kpiClubs:'Clubes', kpiClasses:'Clases', kpiOfficials:'Oficiales', kpiFeds:'Federaciones',
+    open:'Abrir', ongoing:'en curso',
+    compList:'Competiciones', compListSub:'Lista ficticia. Haz clic en una fila para abrir.',
+    thComp:'Competicion', thDate:'Fecha', thClasses:'Clases', thStatus:'Estado', statusLive:'EN CURSO', statusDone:'FINALIZADA',
+    compOverview:'Resumen', general:'Datos generales', location:'Lugar', dates:'Fechas', level:'Nivel', natl:'Nacional',
+    classesTitle:'Clases / categorias', pickClass:'Selecciona una clase para ver los juegos',
+    schedule:'Calendario (resumen)', thTime:'Hora', thCourt:'Cancha', thMatch:'Partido',
+    goGames:'Ver tabla de juegos',
+    gamesTitle:'Tabla de juegos', method:'Metodo de disputa', methodTxt:'Grupos todos contra todos + eliminatoria (manual BISFed). Avanzan los mejores de cada grupo; playoff cuando hace falta para 3/5/6/7 grupos.',
+    groups:'Grupos (todos contra todos)', standings:'Clasificacion', knockout:'Cuadro eliminatorio',
+    thPos:'#', thTeam:'Atleta / Equipo', thP:'PJ', thW:'G', thL:'P', thPts:'Pts', thDiff:'Dif',
+    viewSheet:'Planilla en vivo', viewBoard:'Marcador',
+    court:'Cancha', vs:'ROJO x AZUL', title:'PLANILLA DE JUEGO', timeV:'Tiempo (R)', pts:'Puntos', partial:'Parcial', timeA:'Tiempo (A)', finalScore:'MARCADOR FINAL', winner:'Ganador',
+    qf:'Cuartos de final', sf:'Semifinal', fin:'Final', live:'Marcador en vivo - partidos en curso',
+    reportsTitle:'Informes', reportsSub:'Documentos generados por el sistema (demo).',
+    rFinal:'Clasificacion final', rSheet:'Planilla PDF', rDT:'Informe del Delegado Tecnico',
+    finalRank:'CLASIFICACION FINAL', dtReport:'INFORME DEL DELEGADO TECNICO', generated:'Generado por SCBP - demo',
+    dtLine1:'Competicion realizada segun lo previsto. Todas las clases completadas.',
+    dtLine2:'Juegos: 24 disputados, 0 walkovers, 1 doble forfeit registrado.',
+    dtLine3:'Clasificacion resuelta con los 8 criterios oficiales de desempate.',
+    dtLine4:'Resultados sincronizados con World Boccia (BCMS) - sin divergencias.',
+    footer:'SCBP - software propietario para gestion de competiciones de boccia paralimpica.', contact:'Interesado? Contacto:' },
+  pt:{ role:'Admin Nacional', badge:'DEMO - dados ficticios',
+    aviso:'Demonstracao de navegacao com dados ficticios. Nao e o sistema real - sem banco, sem login. Sistema completo sob licenca (contato abaixo).',
+    menu:{home:'Painel', comps:'Competicoes', athletes:'Atletas', clubs:'Clubes', classes:'Classes', officials:'Oficiais', reports:'Relatorios'},
+    dash:'Painel', dashSub:'Visao nacional - clique em um cartao para explorar.',
+    kpiComps:'Competicoes', kpiAthletes:'Atletas', kpiClubs:'Clubes', kpiClasses:'Classes', kpiOfficials:'Oficiais', kpiFeds:'Federacoes',
+    open:'Abrir', ongoing:'em andamento',
+    compList:'Competicoes', compListSub:'Lista ficticia. Clique em uma linha para abrir.',
+    thComp:'Competicao', thDate:'Data', thClasses:'Classes', thStatus:'Status', statusLive:'EM ANDAMENTO', statusDone:'ENCERRADA',
+    compOverview:'Resumo', general:'Dados gerais', location:'Local', dates:'Datas', level:'Nivel', natl:'Nacional',
+    classesTitle:'Classes / categorias', pickClass:'Selecione uma classe para ver os jogos',
+    schedule:'Agenda (resumo)', thTime:'Hora', thCourt:'Quadra', thMatch:'Partida',
+    goGames:'Ver tabela de jogos',
+    gamesTitle:'Tabela de jogos', method:'Metodo de disputa', methodTxt:'Grupos todos contra todos + eliminatoria (manual BISFed). Avancam os melhores de cada grupo; playoff quando necessario para 3/5/6/7 grupos.',
+    groups:'Grupos (todos contra todos)', standings:'Classificacao', knockout:'Chaveamento eliminatorio',
+    thPos:'#', thTeam:'Atleta / Equipe', thP:'J', thW:'V', thL:'D', thPts:'Pts', thDiff:'Saldo',
+    viewSheet:'Sumula ao vivo', viewBoard:'Scoreboard',
+    court:'Quadra', vs:'VERMELHO x AZUL', title:'SUMULA DE JOGO', timeV:'Tempo (V)', pts:'Pontos', partial:'Parcial', timeA:'Tempo (A)', finalScore:'PLACAR FINAL', winner:'Vencedor',
+    qf:'Quartas de Final', sf:'Semifinal', fin:'Final', live:'Placar ao vivo - jogos em andamento',
+    reportsTitle:'Relatorios', reportsSub:'Documentos gerados pelo sistema (demo).',
+    rFinal:'Classificacao final', rSheet:'Sumula PDF', rDT:'Relatorio do Delegado Tecnico',
+    finalRank:'CLASSIFICACAO FINAL', dtReport:'RELATORIO DO DELEGADO TECNICO', generated:'Gerado pelo SCBP - demo',
+    dtLine1:'Competicao realizada conforme o previsto. Todas as classes concluidas.',
+    dtLine2:'Jogos: 24 disputados, 0 W.O., 1 duplo forfeit registrado.',
+    dtLine3:'Classificacao resolvida com os 8 criterios oficiais de desempate.',
+    dtLine4:'Resultados sincronizados com a World Boccia (BCMS) - sem divergencias.',
+    footer:'SCBP - software proprietario para gestao de competicoes de bocha paralimpica.', contact:'Interessado? Contato:' },
+};
+
+// FICTIONAL DATA
+const KPI = { comps:2, athletes:48, clubs:12, classes:7, officials:9, feds:5 };
+const COMPS = [
+  { id:'c1', nome:'DEMO BOCCIA CUP', data:'2026-05-10', cidade:'DEMO CITY', classes:['BC1','BC2','BC3','BC4'], status:'live' },
+  { id:'c2', nome:'DEMO REGIONAL OPEN', data:'2026-03-02', cidade:'DEMO TOWN', classes:['BC1','BC2'], status:'done' },
+];
+const GROUP = [
+  { pos:1, nome:'1105 - RED DEMO (ALPHA)', p:3, w:3, l:0, pts:6, diff:'+14' },
+  { pos:2, nome:'1102 - BLUE DEMO (BETA)', p:3, w:2, l:1, pts:4, diff:'+3' },
+  { pos:3, nome:'1108 - GREEN DEMO (GAMMA)', p:3, w:1, l:2, pts:2, diff:'-5' },
+  { pos:4, nome:'1104 - GREY DEMO (DELTA)', p:3, w:0, l:3, pts:0, diff:'-12' },
+];
+const SCHED = [
+  { time:'09:00', court:1, match:'1105 x 1104' },
+  { time:'09:30', court:2, match:'1102 x 1108' },
+  { time:'10:00', court:1, match:'1105 x 1108' },
+];
 const partida = {
-  comp:'DEMO BOCCIA CUP',
-  p1: { bib:'1105', nome:'RED ATHLETE (DEMO)', clube:'ALPHA CLUB' },
-  p2: { bib:'1102', nome:'BLUE ATHLETE (DEMO)', clube:'BETA CLUB' },
+  p1:{ bib:'1105', nome:'RED ATHLETE (DEMO)', clube:'ALPHA CLUB' },
+  p2:{ bib:'1102', nome:'BLUE ATHLETE (DEMO)', clube:'BETA CLUB' },
   parciais:[ {p1:1,p2:0,t1:'00:14',t2:'01:48'}, {p1:1,p2:0,t1:'00:06',t2:'00:00'},
              {p1:3,p2:0,t1:'00:56',t2:'02:39'}, {p1:1,p2:0,t1:'00:00',t2:'01:37'} ],
 };
 const chave = {
-  QF:[ ['1105 · ALPHA','1104 · DELTA','10','1'], ['1102 · BETA','1108 · GAMMA','6','2'] ],
-  SF:[ ['WINNER QF1','WINNER QF2','—','—'] ],
-  FIN:[ ['WINNER SF1','WINNER SF2','—','—'] ],
+  QF:[ ['1105 - ALPHA','1104 - DELTA','10','1'], ['1102 - BETA','1108 - GAMMA','6','2'] ],
+  SF:[ ['WINNER QF1','WINNER QF2','-','-'] ],
+  FIN:[ ['WINNER SF1','WINNER SF2','-','-'] ],
 };
 const scoreboard = [
-  { r:'2401 · ALPHA', b:'2404 · DELTA', sr:4, sb:2, court:1 },
-  { r:'2402 · BETA', b:'2408 · GAMMA', sr:1, sb:6, court:2 },
-  { r:'2405 · OMEGA', b:'2406 · SIGMA', sr:3, sb:3, court:3 },
+  { r:'2401 - ALPHA', b:'2404 - DELTA', sr:4, sb:2, court:1 },
+  { r:'2402 - BETA', b:'2408 - GAMMA', sr:1, sb:6, court:2 },
+  { r:'2405 - OMEGA', b:'2406 - SIGMA', sr:3, sb:3, court:3 },
+];
+const RANKING = [
+  { pos:1, nome:'1105 - RED DEMO', clube:'ALPHA CLUB' },
+  { pos:2, nome:'1102 - BLUE DEMO', clube:'BETA CLUB' },
+  { pos:3, nome:'1108 - GREEN DEMO', clube:'GAMMA CLUB' },
+  { pos:4, nome:'1104 - GREY DEMO', clube:'DELTA CLUB' },
+  { pos:5, nome:'1107 - AMBER DEMO', clube:'OMEGA CLUB' },
 ];
 
-let LANG = 'en', TELA = 'sumula';
+// STATE + helpers
+let LANG='en', VIEW='home', CTX={}; // CTX: comp, cls
 const app = document.getElementById('app');
-const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const T = () => I18N[LANG];
+const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function go(v, ctx){ VIEW=v; if(ctx) CTX={...CTX,...ctx}; render(); }
 
-function pintarNav() {
-  const t = T().tabs;
-  document.getElementById('nav').innerHTML = Object.keys(t).map(k =>
-    `<button data-tela="${k}" class="${k===TELA?'active':''}">${esc(t[k])}</button>`).join('');
-  document.querySelectorAll('#nav button').forEach(b => b.onclick = () => { TELA=b.dataset.tela; render(); });
+// SIDEBAR
+function paintSide(){
+  const m = T().menu;
+  const items = [['home',m.home],['comps',m.comps],['athletes',m.athletes],['clubs',m.clubs],['classes',m.classes],['officials',m.officials],['reports',m.reports]];
+  const activeTop = (VIEW==='home')?'home':(VIEW==='reports')?'reports':(['comps','comp','games','sheet','board'].includes(VIEW))?'comps':'';
+  document.getElementById('side').innerHTML =
+    `<div class="side-title">${esc(T().menu.home)}</div>` +
+    items.map(([k,l])=>`<button data-nav="${k}" class="${k===activeTop?'active':''}">${esc(l)}</button>`).join('');
+  document.querySelectorAll('#side button').forEach(b=> b.onclick = ()=>{
+    const k=b.dataset.nav;
+    if(k==='comps') go('comps');
+    else if(k==='reports') go('reports');
+    else if(k==='home') go('home');
+    else go('comps'); // athletes/clubs/classes/officials -> demo routes to competitions list
+  });
+  document.getElementById('role').textContent = T().role;
   document.getElementById('badge').textContent = T().badge;
   document.getElementById('aviso').textContent = T().aviso;
-  document.getElementById('footer').innerHTML = `${esc(T().footer)}<br>${esc(T().contact)} <a href="mailto:${EMAIL}">${EMAIL}</a> · Gabriel Sousa.`;
+  document.getElementById('footer').innerHTML = `${esc(T().footer)}<br>${esc(T().contact)} <a href="mailto:${EMAIL}">${EMAIL}</a> - Gabriel Sousa.`;
 }
+function crumb(parts){
+  return `<div class="crumb">` + parts.map((p,i)=>{
+    const sep = i? ' / ' : '';
+    return sep + (p.go? `<span class="lnk" data-go="${p.go}">${esc(p.t)}</span>` : `<b>${esc(p.t)}</b>`);
+  }).join('') + `</div>`;
+}
+function bindCrumb(){ document.querySelectorAll('.crumb .lnk').forEach(x=> x.onclick=()=>go(x.dataset.go)); }
 
-function telaSumula() {
-  const P = partida, L = T();
-  const t1 = P.parciais.reduce((s,p)=>s+p.p1,0), t2 = P.parciais.reduce((s,p)=>s+p.p2,0);
-  const rows = P.parciais.map((p,i)=>`<tr><td>${p.t1}</td><td class="sc-red">${p.p1}</td>
+// VIEWS
+function vHome(){
+  const L=T();
+  const tile=(k,l,route)=>`<div class="tile" data-route="${route}"><div class="k">${k}</div><div class="l">${esc(l)}</div><div class="go">${esc(L.open)} &rarr;</div></div>`;
+  app.innerHTML = `${crumb([{t:L.dash}])}
+    <h2 class="page">${esc(L.dash)}</h2><p class="sub">${esc(L.dashSub)}</p>
+    <div class="grid">
+      ${tile(KPI.comps, L.kpiComps, 'comps')}
+      ${tile(KPI.athletes, L.kpiAthletes, 'comps')}
+      ${tile(KPI.clubs, L.kpiClubs, 'comps')}
+      ${tile(KPI.classes, L.kpiClasses, 'comps')}
+      ${tile(KPI.officials, L.kpiOfficials, 'comps')}
+      ${tile(KPI.feds, L.kpiFeds, 'comps')}
+    </div>`;
+  document.querySelectorAll('.tile').forEach(t=> t.onclick=()=>go(t.dataset.route));
+}
+function vComps(){
+  const L=T();
+  const rows = COMPS.map(c=>`<tr class="rowlink" data-id="${c.id}">
+    <td><b>${esc(c.nome)}</b></td><td>${esc(c.data)}</td><td>${c.classes.length}</td>
+    <td><span class="tag ${c.status==='live'?'grp':'ko'}">${c.status==='live'?esc(L.statusLive):esc(L.statusDone)}</span></td></tr>`).join('');
+  app.innerHTML = `${crumb([{t:L.dash,go:'home'},{t:L.compList}])}
+    <h2 class="page">${esc(L.compList)}</h2><p class="sub">${esc(L.compListSub)}</p>
+    <div class="panel"><table class="data"><thead><tr>
+      <th>${esc(L.thComp)}</th><th>${esc(L.thDate)}</th><th>${esc(L.thClasses)}</th><th>${esc(L.thStatus)}</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`;
+  bindCrumb();
+  document.querySelectorAll('.rowlink').forEach(r=> r.onclick=()=>go('comp',{comp:COMPS.find(c=>c.id===r.dataset.id)}));
+}
+function vComp(){
+  const L=T(), c=CTX.comp||COMPS[0];
+  const chips = c.classes.map((cl,i)=>`<span class="chip ${i===0?'active':''}" data-cls="${esc(cl)}">${esc(cl)}</span>`).join('');
+  const sched = SCHED.map(s=>`<tr><td>${esc(s.time)}</td><td>${s.court}</td><td>${esc(s.match)}</td></tr>`).join('');
+  app.innerHTML = `${crumb([{t:L.dash,go:'home'},{t:L.compList,go:'comps'},{t:c.nome}])}
+    <h2 class="page">${esc(c.nome)}</h2><p class="sub">${esc(L.compOverview)}</p>
+    <div class="panel"><h3>${esc(L.general)}</h3>
+      <div class="kv">
+        <div><div class="lbl">${esc(L.location)}</div><div class="val">${esc(c.cidade)}</div></div>
+        <div><div class="lbl">${esc(L.dates)}</div><div class="val">${esc(c.data)}</div></div>
+        <div><div class="lbl">${esc(L.level)}</div><div class="val">${esc(L.natl)}</div></div>
+        <div><div class="lbl">${esc(L.thClasses)}</div><div class="val">${c.classes.length}</div></div>
+      </div></div>
+    <div class="panel"><h3>${esc(L.classesTitle)}</h3>
+      <div class="chips">${chips}</div>
+      <p class="sub" style="margin:12px 0 0;">${esc(L.pickClass)}</p>
+      <div class="btnrow"><button class="btn" id="toGames">${esc(L.goGames)} &rarr;</button></div>
+    </div>
+    <div class="panel"><h3>${esc(L.schedule)}</h3>
+      <table class="data"><thead><tr><th>${esc(L.thTime)}</th><th>${esc(L.thCourt)}</th><th>${esc(L.thMatch)}</th></tr></thead>
+      <tbody>${sched}</tbody></table></div>`;
+  bindCrumb();
+  document.querySelectorAll('.chip').forEach(ch=> ch.onclick=()=>{ document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); ch.classList.add('active'); CTX.cls=ch.dataset.cls; });
+  document.getElementById('toGames').onclick=()=>go('games',{cls: CTX.cls || c.classes[0]});
+}
+function vGames(){
+  const L=T(), c=CTX.comp||COMPS[0], cls=CTX.cls||c.classes[0];
+  const grows = GROUP.map(g=>`<tr>
+    <td>${g.pos}</td><td class="name" style="text-align:left">${esc(g.nome)}</td>
+    <td>${g.p}</td><td class="win">${g.w}</td><td class="los">${g.l}</td><td><b>${g.pts}</b></td><td>${esc(g.diff)}</td></tr>`).join('');
+  const col=(titulo,jogos)=>`<div class="bk-col"><h4>${esc(titulo)}</h4>${jogos.map(j=>`
+    <div class="bk-match"><div class="bk-row ${(+j[2]>+j[3])?'w':''}"><span>${esc(j[0])}</span><b>${esc(j[2])}</b></div>
+    <div class="bk-row ${(+j[3]>+j[2])?'w':''}"><span>${esc(j[1])}</span><b>${esc(j[3])}</b></div></div>`).join('')}</div>`;
+  app.innerHTML = `${crumb([{t:L.dash,go:'home'},{t:L.compList,go:'comps'},{t:c.nome,go:'comp'},{t:L.gamesTitle+' - '+cls}])}
+    <h2 class="page">${esc(L.gamesTitle)} <span style="color:#60a5fa">${esc(cls)}</span></h2>
+    <div class="panel"><h3>${esc(L.method)}</h3><p class="sub" style="margin:0">${esc(L.methodTxt)}</p></div>
+    <div class="panel"><h3>${esc(L.groups)} - ${esc(L.standings)}</h3>
+      <table class="data"><thead><tr>
+        <th>${esc(L.thPos)}</th><th>${esc(L.thTeam)}</th><th>${esc(L.thP)}</th><th>${esc(L.thW)}</th><th>${esc(L.thL)}</th><th>${esc(L.thPts)}</th><th>${esc(L.thDiff)}</th>
+      </tr></thead><tbody>${grows}</tbody></table>
+      <div class="btnrow"><button class="btn" id="bSheet">${esc(L.viewSheet)}</button><button class="btn ghost" id="bBoard">${esc(L.viewBoard)}</button></div>
+    </div>
+    <div class="panel"><h3>${esc(L.knockout)}</h3>
+      <div class="card" style="margin:0"><div class="bk">${col(L.qf,chave.QF)}${col(L.sf,chave.SF)}${col(L.fin,chave.FIN)}</div></div>
+    </div>`;
+  bindCrumb();
+  document.getElementById('bSheet').onclick=()=>go('sheet');
+  document.getElementById('bBoard').onclick=()=>go('board');
+}
+function vSheet(){
+  const L=T(), P=partida, c=CTX.comp||COMPS[0];
+  const t1=P.parciais.reduce((s,p)=>s+p.p1,0), t2=P.parciais.reduce((s,p)=>s+p.p2,0);
+  const rows=P.parciais.map((p,i)=>`<tr><td>${p.t1}</td><td class="sc-red">${p.p1}</td>
     <td style="background:#f8fafc;font-weight:800;">P${i+1}</td><td class="sc-blue">${p.p2}</td><td>${p.t2}</td></tr>`).join('');
-  const w = t1>t2?P.p1:P.p2;
-  app.innerHTML = `<div class="card">
-    <div class="sum-head"><div class="sum-title">${esc(L.title)} — ${esc(P.comp)}</div></div>
+  const w=t1>t2?P.p1:P.p2;
+  app.innerHTML = `${crumb([{t:L.dash,go:'home'},{t:c.nome,go:'comp'},{t:L.gamesTitle,go:'games'},{t:L.viewSheet}])}
+    <div class="card">
+    <div class="sum-head"><div class="sum-title">${esc(L.title)} - ${esc(c.nome)}</div></div>
     <table class="sum"><thead>
       <tr><th colspan="2" class="p-red"><div class="p-name">${esc(P.p1.bib+' - '+P.p1.nome)}</div><div class="p-club">${esc(P.p1.clube)}</div></th>
       <th style="background:#0f172a;color:#fff;">${esc(L.vs)}</th>
@@ -152,30 +387,56 @@ function telaSumula() {
       </thead><tbody>${rows}</tbody>
       <tfoot><tr class="final"><td colspan="2" class="sc-red">${t1}</td><td>${esc(L.finalScore)}</td><td colspan="2" class="sc-blue">${t2}</td></tr></tfoot></table>
     <div style="padding:0 18px 18px;"><div class="winner">${esc(L.winner)}: ${esc(w.bib+' - '+w.nome)} (${esc(w.clube)})</div></div>
-  </div>`;
+    </div>`;
+  bindCrumb();
 }
-function telaChave() {
-  const L = T();
-  const col = (titulo,jogos)=>`<div class="bk-col"><h4>${esc(titulo)}</h4>${jogos.map(j=>`
-    <div class="bk-match"><div class="bk-row ${(+j[2]>+j[3])?'win':''}"><span>${esc(j[0])}</span><b>${esc(j[2])}</b></div>
-    <div class="bk-row ${(+j[3]>+j[2])?'win':''}"><span>${esc(j[1])}</span><b>${esc(j[3])}</b></div></div>`).join('')}</div>`;
-  app.innerHTML = `<div class="card"><div class="bk">${col(L.qf,chave.QF)}${col(L.sf,chave.SF)}${col(L.fin,chave.FIN)}</div></div>`;
-}
-function telaScoreboard() {
-  const L = T();
-  app.innerHTML = `<div class="sb"><h2 style="margin-bottom:14px;">${esc(L.live)}</h2>
+function vBoard(){
+  const L=T(), c=CTX.comp||COMPS[0];
+  app.innerHTML = `${crumb([{t:L.dash,go:'home'},{t:c.nome,go:'comp'},{t:L.gamesTitle,go:'games'},{t:L.viewBoard}])}
+    <div class="sb"><h2 style="margin-bottom:14px;">${esc(L.live)}</h2>
     ${scoreboard.map(m=>`<div class="sb-match">
       <div class="sb-side"><span class="dot-r"></span>${esc(m.r)}</div>
-      <div class="sb-score">${m.sr} <span style="color:#475569;">×</span> ${m.sb}</div>
+      <div class="sb-score">${m.sr} <span style="color:#475569;">x</span> ${m.sb}</div>
       <div class="sb-side">${esc(m.b)}<span class="dot-b"></span></div>
       <div style="color:#94a3b8;font-size:12px;min-width:90px;text-align:right;">${esc(L.court)} ${m.court}</div></div>`).join('')}
-  </div>`;
+    </div>`;
+  bindCrumb();
 }
-function render() {
-  pintarNav();
-  ({ sumula:telaSumula, chave:telaChave, scoreboard:telaScoreboard })[TELA]();
+function vReports(){
+  const L=T();
+  const tile=(l,route)=>`<div class="tile" data-r="${route}"><div class="l" style="font-size:14px;color:#fff;font-weight:700">${esc(l)}</div><div class="go">${esc(L.open)} &rarr;</div></div>`;
+  app.innerHTML = `${crumb([{t:L.dash,go:'home'},{t:L.reportsTitle}])}
+    <h2 class="page">${esc(L.reportsTitle)}</h2><p class="sub">${esc(L.reportsSub)}</p>
+    <div class="grid">
+      ${tile(L.rFinal,'rank')}${tile(L.rSheet,'sheet')}${tile(L.rDT,'dt')}
+    </div>`;
+  bindCrumb();
+  document.querySelectorAll('.tile').forEach(t=> t.onclick=()=>{ const r=t.dataset.r; if(r==='sheet') go('sheet'); else if(r==='rank') go('rank'); else go('dt'); });
 }
-document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
+function vRank(){
+  const L=T(), c=CTX.comp||COMPS[0];
+  const rows=RANKING.map(r=>`<tr class="${r.pos===1?'medal1':r.pos===2?'medal2':r.pos===3?'medal3':''}">
+    <td><b>${r.pos}</b></td><td class="name">${esc(r.nome)}</td><td>${esc(r.clube)}</td></tr>`).join('');
+  app.innerHTML = `${crumb([{t:L.dash,go:'home'},{t:L.reportsTitle,go:'reports'},{t:L.rFinal}])}
+    <div class="report"><h3>${esc(L.finalRank)}</h3><div class="rsub">${esc(c.nome)} - ${esc(L.generated)}</div>
+    <table class="rank"><thead><tr><th>${esc(L.thPos)}</th><th style="text-align:left">${esc(L.thTeam)}</th><th>${esc(L.kpiClubs)}</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+  bindCrumb();
+}
+function vDT(){
+  const L=T(), c=CTX.comp||COMPS[0];
+  app.innerHTML = `${crumb([{t:L.dash,go:'home'},{t:L.reportsTitle,go:'reports'},{t:L.rDT}])}
+    <div class="report"><h3>${esc(L.dtReport)}</h3><div class="rsub">${esc(c.nome)} - ${esc(L.generated)}</div>
+    <ul style="line-height:1.9;font-size:14px;padding-left:20px;">
+      <li>${esc(L.dtLine1)}</li><li>${esc(L.dtLine2)}</li><li>${esc(L.dtLine3)}</li><li>${esc(L.dtLine4)}</li>
+    </ul></div>`;
+  bindCrumb();
+}
+
+const VIEWS = { home:vHome, comps:vComps, comp:vComp, games:vGames, sheet:vSheet, board:vBoard, reports:vReports, rank:vRank, dt:vDT };
+function render(){ paintSide(); (VIEWS[VIEW]||vHome)(); }
+
+document.querySelectorAll('.lang button').forEach(b=> b.onclick=()=>{
   LANG=b.dataset.lang; document.documentElement.lang=LANG;
   document.querySelectorAll('.lang button').forEach(x=>x.classList.toggle('active', x===b));
   render();
